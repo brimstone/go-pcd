@@ -51,6 +51,9 @@ func Test_handleHostnamePost(t *testing.T) {
 	MyWriteFile = func(filename string, contents []byte, mode os.FileMode) error {
 		return nil
 	}
+	MyExec = func(cmd string, arg ...string) ([]byte, error) {
+		return []byte{}, nil
+	}
 	handleHostname(w, req)
 	if w.Code != 200 {
 		t.Errorf("Got unexpected status code")
