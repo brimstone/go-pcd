@@ -34,10 +34,10 @@ func RealExec(cmd string, arg ...string) ([]byte, error) {
 	return exec.Command(cmd, arg...).CombinedOutput()
 }
 
-func readKernelConfig() {
-	cmdline, err := ioutil.ReadFile("/proc/cmdline")
+func readKernelConfig() error {
+	cmdline, err := MyReadFile("/proc/cmdline")
 	if err != nil {
-		panic(fmt.Sprint("Error opening /proc/cmdline:", err.Error()))
+		return err
 	}
 	options := strings.Split(strings.TrimSpace(string(cmdline)), " ")
 	for _, option := range options {
@@ -51,6 +51,7 @@ func readKernelConfig() {
 			viper.Set(kv[0], kv[1])
 		}
 	}
+	return nil
 }
 
 func saveConfig() {
@@ -78,14 +79,16 @@ func main() {
 	MyWriteFile = RealWriteFile
 	MyExec = RealExec
 	viper.SetDefault("file", "/boot/config.json")
-	readKernelConfig()
+	err := readKernelConfig()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	viper.SetConfigFile(viper.GetString("file"))
-	cmd := exec.Command("mount", "LABEL=BOOT", "/boot")
-	err := cmd.Run()
+	_, err = MyExec("mount", "LABEL=BOOT", "/boot")
 	if err == nil {
 		err = viper.ReadInConfig()
-		cmd = exec.Command("umount", "/boot")
-		cmd.Run()
+		_, err = MyExec("umount", "/boot")
 		if err != nil {
 			fmt.Println("Error reading config file: ", err.Error())
 		}
