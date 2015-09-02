@@ -54,18 +54,19 @@ func readKernelConfig() error {
 	return nil
 }
 
-func saveConfig() {
+func saveConfig() error {
 	_, err := MyExec("mount", "LABEL=BOOT", "/boot")
 	if err != nil {
-		return
+		return err
 	}
 	b, _ := json.MarshalIndent(viper.AllSettings(), "", "  ")
 	err = MyWriteFile(viper.GetString("file"), b, 0644)
 	if err != nil {
-		panic(fmt.Sprint("Error opening file:", err.Error()))
+		return err
 	}
 	fmt.Println("Config saved.")
 	MyExec("umount", "/boot")
+	return nil
 }
 
 func runHandlers() {
