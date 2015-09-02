@@ -74,6 +74,21 @@ func runHandlers() {
 	}
 }
 
+func readConfig() error {
+	_, err := MyExec("mount", "LABEL=BOOT", "/boot")
+	if err == nil {
+		err = viper.ReadInConfig()
+		_, err = MyExec("umount", "/boot")
+		if err != nil {
+			fmt.Println("Error reading config file: ", err.Error())
+		}
+		saveConfig()
+	} else {
+		fmt.Println(err.Error())
+	}
+	return nil
+}
+
 func main() {
 	MyReadFile = RealReadFile
 	MyWriteFile = RealWriteFile
@@ -85,17 +100,7 @@ func main() {
 		os.Exit(1)
 	}
 	viper.SetConfigFile(viper.GetString("file"))
-	_, err = MyExec("mount", "LABEL=BOOT", "/boot")
-	if err == nil {
-		err = viper.ReadInConfig()
-		_, err = MyExec("umount", "/boot")
-		if err != nil {
-			fmt.Println("Error reading config file: ", err.Error())
-		}
-		saveConfig()
-	} else {
-		fmt.Println(err.Error())
-	}
+	readConfig()
 	runHandlers()
 
 	fmt.Println("Starting http server on :8080")
