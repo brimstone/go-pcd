@@ -48,7 +48,6 @@ func Test_readConfig(t *testing.T) {
 	}
 }
 
-
 func Test_readConfigError1(t *testing.T) {
 	t.Log("Testing readConfig read error")
 
@@ -66,9 +65,9 @@ func Test_readConfigError2(t *testing.T) {
 	t.Log("Testing readConfig read error")
 
 	MyExec = func(cmd string, arg ...string) ([]byte, error) {
-	if cmd == "mount" {
-return []byte{},nil
-}
+		if cmd == "mount" {
+			return []byte{}, nil
+		}
 		return []byte{}, fmt.Errorf("Exec error")
 	}
 
