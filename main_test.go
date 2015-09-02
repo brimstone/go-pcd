@@ -76,3 +76,33 @@ func Test_readConfigError2(t *testing.T) {
 		t.Errorf("Error:", err.Error())
 	}
 }
+
+func Test_saveConfigError1(t *testing.T) {
+	t.Log("Testing saveConfig exec error")
+
+	MyExec = func(cmd string, arg ...string) ([]byte, error) {
+		return []byte{}, fmt.Errorf("Exec error")
+	}
+
+	err := saveConfig()
+	if err == nil {
+		t.Errorf("Error:", err.Error())
+	}
+}
+
+func Test_saveConfigError2(t *testing.T) {
+	t.Log("Testing saveConfig read error")
+
+	MyExec = func(cmd string, arg ...string) ([]byte, error) {
+		return []byte{}, nil
+	}
+
+	MyWriteFile = func(filename string, contents []byte, mode os.FileMode) error {
+		return fmt.Errorf("Write error")
+	}
+
+	err := saveConfig()
+	if err == nil {
+		t.Errorf("Error:", err.Error())
+	}
+}
