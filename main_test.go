@@ -130,3 +130,8 @@ func Test_RealExecError(t *testing.T) {
 		t.Errorf("Error:", err.Error())
 	}
 }
+
+func Test_runHandlers(t *testing.T) {
+	t.Log("Testing runHandlers")
+	runHandlers()
+}
