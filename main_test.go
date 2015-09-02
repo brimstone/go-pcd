@@ -106,3 +106,27 @@ func Test_saveConfigError2(t *testing.T) {
 		t.Errorf("Error:", err.Error())
 	}
 }
+
+func Test_RealReadFileError(t *testing.T) {
+	t.Log("Testing RealReadFile read error")
+	_, err := RealReadFile("asdf")
+	if err == nil {
+		t.Errorf("Error:", err.Error())
+	}
+}
+
+func Test_RealWriteFileError(t *testing.T) {
+	t.Log("Testing RealWriteFile read error")
+	err := RealWriteFile("/asdf", []byte{}, 0644)
+	if err == nil {
+		t.Errorf("Error:", err.Error())
+	}
+}
+
+func Test_RealExecError(t *testing.T) {
+	t.Log("Testing RealExec read error")
+	_, err := RealExec("asdf")
+	if err == nil {
+		t.Errorf("Error:", err.Error())
+	}
+}
