@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"os/exec"
 	"time"
 
 	"github.com/spf13/viper"
@@ -26,8 +25,7 @@ func RestartDocker() {
 		restartTimer.Stop()
 	}
 	restartTimer = time.AfterFunc(time.Second, func() {
-		cmd := exec.Command("sv", "restart", "/service/docker")
-		cmd.Run()
+		MyExec("sv", "restart", "/service/docker")
 	})
 }
 
@@ -35,7 +33,7 @@ func WriteDockerConfig() {
 	fmt.Println("Writing docker config")
 	config := fmt.Sprintf("BIP=\"%s\"\n", viper.GetString("docker.bip"))
 	os.Mkdir("/etc/config", 0755)
-	ioutil.WriteFile("/etc/config/docker", []byte(config), 0644)
+	MyWriteFile("/etc/config/docker", []byte(config), 0644)
 }
 
 func handleDockerBip(w http.ResponseWriter, r *http.Request) {
