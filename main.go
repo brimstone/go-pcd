@@ -69,12 +69,6 @@ func saveConfig() error {
 	return nil
 }
 
-func runHandlers() {
-	for init := range inits {
-		inits[init]()
-	}
-}
-
 func readConfig() error {
 	_, err := MyExec("mount", "LABEL=BOOT", "/boot")
 	if err == nil {
@@ -90,11 +84,14 @@ func readConfig() error {
 	return nil
 }
 
-func main() {
+func init() {
 	MyReadFile = RealReadFile
 	MyWriteFile = RealWriteFile
 	MyExec = RealExec
 
+}
+
+func main() {
 	var rootCmd = &cobra.Command{
 		Use:  os.Args[0],
 		Long: "Pancake Crop Deli Control Program",
