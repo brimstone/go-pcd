@@ -130,3 +130,8 @@ func Test_RealExecError(t *testing.T) {
 		t.Errorf("Error:", err.Error())
 	}
 }
+
+func Test_main(t *testing.T) {
+	os.Args[1] = "help"
+	main()
+}
