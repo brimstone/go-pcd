@@ -4,31 +4,31 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"os/exec"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var API_VERSION = "/1"
-
-var inits []func()
-
-var MyReadFile func(string) ([]byte, error)
+var (
+	API_VERSION = "1"
+	BASE_URL    = "http://127.0.0.1:8080/"
+	MyExec      func(string, ...string) ([]byte, error)
+	MyReadFile  func(string) ([]byte, error)
+	MyWriteFile func(string, []byte, os.FileMode) error
+	cmds        []*cobra.Command
+	inits       []func()
+)
 
 func RealReadFile(filename string) ([]byte, error) {
 	return ioutil.ReadFile(filename)
 }
 
-var MyWriteFile func(string, []byte, os.FileMode) error
-
 func RealWriteFile(filename string, contents []byte, mode os.FileMode) error {
 	return ioutil.WriteFile(filename, contents, mode)
 }
-
-var MyExec func(string, ...string) ([]byte, error)
 
 func RealExec(cmd string, arg ...string) ([]byte, error) {
 	return exec.Command(cmd, arg...).CombinedOutput()
@@ -94,17 +94,14 @@ func main() {
 	MyReadFile = RealReadFile
 	MyWriteFile = RealWriteFile
 	MyExec = RealExec
-	viper.SetDefault("file", "/boot/config.json")
-	err := readKernelConfig()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+
+	var rootCmd = &cobra.Command{
+		Use:  os.Args[0],
+		Long: "Control application for PCD API",
 	}
-	viper.SetConfigFile(viper.GetString("file"))
-	readConfig()
-	runHandlers()
 
-	fmt.Println("Starting http server on :8080")
-	http.ListenAndServe("127.0.0.1:8080", nil)
-
+	for cmd := range cmds {
+		rootCmd.AddCommand(cmds[cmd])
+	}
+	rootCmd.Execute()
 }
