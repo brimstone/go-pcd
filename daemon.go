@@ -29,6 +29,6 @@ func mode_daemon(cmd *cobra.Command, args []string) {
 	readConfig()
 	runHandlers()
 
-	fmt.Println("Starting http server on :8080")
-	http.ListenAndServe("127.0.0.1:8080", nil)
+	fmt.Println("Starting http server on " + BASE_URL)
+	http.ListenAndServe(BASE_URL, nil)
 }

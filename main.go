@@ -14,7 +14,7 @@ import (
 
 var (
 	API_VERSION = "1"
-	BASE_URL    = "http://127.0.0.1:8080"
+	BASE_URL    string
 	MyExec      func(string, ...string) ([]byte, error)
 	MyReadFile  func(string) ([]byte, error)
 	MyWriteFile func(string, []byte, os.FileMode) error
@@ -103,5 +103,6 @@ func main() {
 	for cmd := range cmds {
 		rootCmd.AddCommand(cmds[cmd])
 	}
+	rootCmd.PersistentFlags().StringVarP(&BASE_URL, "address", "a", "127.0.0.1:8080", "Address for API server")
 	rootCmd.Execute()
 }
