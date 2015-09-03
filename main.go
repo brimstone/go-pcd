@@ -97,7 +97,7 @@ func main() {
 
 	var rootCmd = &cobra.Command{
 		Use:  os.Args[0],
-		Long: "Control application for PCD API",
+		Long: "Pancake Crop Deli Control Program",
 	}
 
 	for cmd := range cmds {
