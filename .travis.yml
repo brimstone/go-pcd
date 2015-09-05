@@ -4,8 +4,6 @@ go:
 before_install:
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
-  - go get golang.org/x/tools/cmd/cover
-  - go get github.com/spf13/cobra
-  - go get github.com/spf13/viper
+  - go get -v -d
 script:
   - $HOME/gopath/bin/goveralls -repotoken 4dAp4ODDdhtCTRp65JsfLr15ewtqqRkLZ
