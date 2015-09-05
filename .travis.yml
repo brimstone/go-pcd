@@ -4,6 +4,7 @@ go:
 before_install:
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
+  - go get github.com/brimstone/go-saverequest
   - go get -v -d
 script:
   - $HOME/gopath/bin/goveralls -repotoken 4dAp4ODDdhtCTRp65JsfLr15ewtqqRkLZ
