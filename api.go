@@ -9,7 +9,7 @@ import (
 )
 
 func APIGet(path string) string {
-	resp, err := http.Get(BASE_URL + "/" + API_VERSION + "/" + path)
+	resp, err := http.Get("http://" + BASE_URL + "/" + API_VERSION + "/" + path)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -24,7 +24,7 @@ func APIGet(path string) string {
 }
 
 func APIPost(path string, payload string) {
-	_, err := http.Post(BASE_URL+"/"+API_VERSION+"/"+path,
+	_, err := http.Post("http://"+BASE_URL+"/"+API_VERSION+"/"+path,
 		"text/plain",
 		bytes.NewBufferString(payload))
 	if err != nil {

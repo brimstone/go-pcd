@@ -14,7 +14,9 @@ import (
 
 var (
 	API_VERSION = "1"
-	BASE_URL    string
+	BASE_URL    = "127.0.0.1:8080"
+	MyAPIGet    func(string) string
+	MyAPIPost   func(string, string)
 	MyExec      func(string, ...string) ([]byte, error)
 	MyReadFile  func(string) ([]byte, error)
 	MyWriteFile func(string, []byte, os.FileMode) error
@@ -85,10 +87,11 @@ func readConfig() error {
 }
 
 func init() {
+	MyAPIGet = APIGet
+	MyAPIPost = APIPost
 	MyReadFile = RealReadFile
 	MyWriteFile = RealWriteFile
 	MyExec = RealExec
-
 }
 
 func main() {

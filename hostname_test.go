@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/brimstone/go-saverequest"
+	"github.com/spf13/cobra"
 )
 
 func Test_handleHostnameGet(t *testing.T) {
@@ -74,4 +75,16 @@ func Test_handleHostnamePostError(t *testing.T) {
 		return
 	}
 	t.Log("Got proper status code")
+}
+func Test_initHostname(t *testing.T) {
+	t.Log("Testing initHostname")
+	MyWriteFile = func(filename string, contents []byte, mode os.FileMode) error {
+		return nil
+	}
+	initHostname()
+}
+
+func Test_cmdHostname(t *testing.T) {
+	t.Log("Testing cmdHostname")
+	cmdHostname(&cobra.Command{}, []string{})
 }

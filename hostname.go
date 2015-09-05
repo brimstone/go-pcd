@@ -15,22 +15,26 @@ func init() {
 		Use:   "hostname [hostname]",
 		Short: "Get or Set Hostname",
 		Long:  "This gets or sets the hostname for the system.",
-		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) == 0 {
-				fmt.Printf("%s", APIGet("hostname"))
-			} else if len(args) == 1 {
-				APIPost("hostname", args[0])
-			} else {
-				cmd.Help()
-			}
-		},
+		Run:   cmdHostname,
 	})
-	inits = append(inits, func() {
-		hostname := viper.GetString("hostname")
-		if hostname != "" {
-			SetHostname([]byte(hostname))
-		}
-	})
+	inits = append(inits, initHostname)
+}
+
+func cmdHostname(cmd *cobra.Command, args []string) {
+	if len(args) == 0 {
+		fmt.Printf("%s", MyAPIGet("hostname"))
+	} else if len(args) == 1 {
+		MyAPIPost("hostname", args[0])
+	} else {
+		cmd.Help()
+	}
+}
+
+func initHostname() {
+	hostname := viper.GetString("hostname")
+	if hostname != "" {
+		SetHostname([]byte(hostname))
+	}
 }
 
 func SetHostname(hostname []byte) error {
