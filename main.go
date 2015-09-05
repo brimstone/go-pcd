@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"os"
 	"os/exec"
 	"strings"
@@ -22,6 +23,7 @@ var (
 	MyWriteFile func(string, []byte, os.FileMode) error
 	cmds        []*cobra.Command
 	inits       []func()
+	listener    net.Listener
 )
 
 func RealReadFile(filename string) ([]byte, error) {
