@@ -15,16 +15,18 @@ func init() {
 		Use:   "docker/bip [address]",
 		Short: "Get or Set Docker Bridge IP",
 		Long:  "This gets or sets the IP for the internal docker bridge.",
-		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) == 0 {
-				fmt.Println(MyAPIGet("docker/bip"))
-			} else if len(args) == 1 {
-				MyAPIPost("docker/bip", args[0])
-			} else {
-				cmd.Help()
-			}
-		},
+		Run:   cmdDockerBip,
 	})
+}
+
+func cmdDockerBip(cmd *cobra.Command, args []string) {
+	if len(args) == 0 {
+		fmt.Println(MyAPIGet("docker/bip"))
+	} else if len(args) == 1 {
+		MyAPIPost("docker/bip", args[0])
+	} else {
+		cmd.Help()
+	}
 }
 
 func handleDockerBip(w http.ResponseWriter, r *http.Request) {

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/brimstone/go-saverequest"
+	"github.com/spf13/cobra"
 )
 
 func Test_handleDockerBipPost(t *testing.T) {
@@ -38,4 +39,28 @@ func Test_handleDockerBipGet(t *testing.T) {
 		return
 	}
 	t.Log("Got proper bip")
+}
+
+func Test_cmdDockerBipBlank(t *testing.T) {
+	t.Log("Testing cmdDockerBip")
+	MyAPIGet = func(path string) string {
+		return ""
+	}
+	cmdDockerBip(&cobra.Command{}, []string{})
+}
+
+func Test_cmdDockerBipSetting(t *testing.T) {
+	t.Log("Testing cmdDockerBip with argument")
+	MyAPIPost = func(path string, payload string) {
+		if payload != "pickles" {
+			t.Errorf("Didn't get expected payload 'pickles': %s", payload)
+		}
+		return
+	}
+	cmdDockerBip(&cobra.Command{}, []string{"pickles"})
+}
+
+func Test_cmdDockerBipInvalid(t *testing.T) {
+	t.Log("Testing cmdDockerBip with invalid arguments")
+	cmdDockerBip(&cobra.Command{}, []string{"invalid", "invalid"})
 }
