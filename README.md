@@ -2,7 +2,7 @@ go-pcd
 ======
 [![Build Status](https://travis-ci.org/brimstone/go-pcd.svg)](https://travis-ci.org/brimstone/go-pcd)[![Coverage Status](https://coveralls.io/repos/brimstone/go-pcd/badge.svg?branch=master&service=github)](https://coveralls.io/github/brimstone/go-pcd?branch=master)
 
-API daemon and controlling program for [pcd](github.com/brimstone/pcd).
+API daemon and controlling program for [pcd](https://github.com/brimstone/pcd).
 
 Usage
 -----
