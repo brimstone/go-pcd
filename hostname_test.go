@@ -10,7 +10,6 @@ import (
 )
 
 func Test_handleHostnameGet(t *testing.T) {
-	// need to reset root
 	t.Log("Testing hostname")
 	req, _ := saverequest.FakeRequest("GET", "/hostname", map[string]string{}, "")
 	w := httptest.NewRecorder()
@@ -27,7 +26,6 @@ func Test_handleHostnameGet(t *testing.T) {
 }
 
 func Test_handleHostnameGetError(t *testing.T) {
-	// need to reset root
 	t.Log("Testing hostname error")
 	req, _ := saverequest.FakeRequest("GET", "/hostname", map[string]string{}, "")
 	w := httptest.NewRecorder()
@@ -44,7 +42,6 @@ func Test_handleHostnameGetError(t *testing.T) {
 }
 
 func Test_handleHostnamePost(t *testing.T) {
-	// need to reset root
 	t.Log("Testing hostname POST")
 	req, _ := saverequest.FakeRequest("POST", "/hostname", map[string]string{}, "hostname")
 	w := httptest.NewRecorder()
@@ -64,7 +61,6 @@ func Test_handleHostnamePost(t *testing.T) {
 }
 
 func Test_handleHostnamePostError(t *testing.T) {
-	// need to reset root
 	t.Log("Testing hostname POST error")
 	req, _ := saverequest.FakeRequest("POST", "/hostname", map[string]string{}, "hostname")
 	w := httptest.NewRecorder()
