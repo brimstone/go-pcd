@@ -84,7 +84,26 @@ func Test_initHostname(t *testing.T) {
 	initHostname()
 }
 
-func Test_cmdHostname(t *testing.T) {
+func Test_cmdHostnameBlank(t *testing.T) {
 	t.Log("Testing cmdHostname")
+	MyAPIGet = func(path string) string {
+		return ""
+	}
 	cmdHostname(&cobra.Command{}, []string{})
+}
+
+func Test_cmdHostnameSetting(t *testing.T) {
+	t.Log("Testing cmdHostname with argument")
+	MyAPIPost = func(path string, payload string) {
+		if payload != "pickles" {
+			t.Errorf("Didn't get expected payload 'pickles': %s", payload)
+		}
+		return
+	}
+	cmdHostname(&cobra.Command{}, []string{"pickles"})
+}
+
+func Test_cmdHostnameInvalid(t *testing.T) {
+	t.Log("Testing cmdHostname with invalid arguments")
+	cmdHostname(&cobra.Command{}, []string{"invalid", "invalid"})
 }
