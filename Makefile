@@ -3,6 +3,6 @@ ifndef GOPATH
 	export GOPATH
 endif
 
-pcd-api: *.go
+pcd: *.go
 	go get -v -d
 	CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags '-s' -o pcd
