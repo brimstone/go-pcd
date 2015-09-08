@@ -7,4 +7,4 @@ before_install:
   - go get github.com/brimstone/go-saverequest
   - go get -v -d
 script:
-  - $HOME/gopath/bin/goveralls -repotoken 4dAp4ODDdhtCTRp65JsfLr15ewtqqRkLZ
+  - $HOME/gopath/bin/goveralls -v -repotoken 4dAp4ODDdhtCTRp65JsfLr15ewtqqRkLZ
