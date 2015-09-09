@@ -24,6 +24,7 @@ var (
 	cmds        []*cobra.Command
 	inits       []func()
 	listener    net.Listener
+	forever     chan bool
 )
 
 func RealReadFile(filename string) ([]byte, error) {

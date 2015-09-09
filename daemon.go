@@ -49,9 +49,7 @@ func modeDaemon(cmd *cobra.Command, args []string) {
 		fmt.Println(err)
 		return
 	}
-	err = http.Serve(listener, nil)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	go http.Serve(listener, nil)
+	forever = make(chan bool)
+	<-forever
 }

@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -26,8 +28,14 @@ func Test_initDaemon(t *testing.T) {
 }
 
 func Test_modeDaemon(t *testing.T) {
+	go func() {
+		time.Sleep(time.Second * 2)
+		log.Println("Closing the channel")
+		forever <- true
+	}()
 	modeDaemon(&cobra.Command{}, []string{})
 	if listener != nil {
+		t.Log("Closing listener")
 		listener.Close()
 	}
 }
