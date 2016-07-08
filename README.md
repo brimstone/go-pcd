@@ -10,19 +10,18 @@ Usage
 ```bash
 Pancake Crop Deli Control Program
 
-Usage: 
+Usage:
   ./pcd [command]
 
-Available Commands: 
+Available Commands:
   daemon      Run the API daemon
   docker/bip  Get or Set Docker Bridge IP
   hostname    Get or Set Hostname
-  help        Help about any command
+  version     Get the client and daemon version
 
 Flags:
-  -a, --address="127.0.0.1:8080": Address for API server
-  -h, --help[=false]: help for ./pcd
-
+  -a, --address string   Address for API server (default "127.0.0.1:8080")
+  -h, --help             help for ./pcd
 
 Use "./pcd [command] --help" for more information about a command.
 ```

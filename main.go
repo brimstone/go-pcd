@@ -28,6 +28,7 @@ type ConfigType struct {
 }
 
 var (
+	COMMITHASH  = "dev"
 	API_VERSION = "1"
 	BASE_URL    = "127.0.0.1:8080"
 	MyAPIGet    func(string) string
