@@ -28,20 +28,21 @@ type ConfigType struct {
 }
 
 var (
-	COMMITHASH  = "dev"
-	API_VERSION = "1"
-	BASE_URL    = "127.0.0.1:8080"
-	MyAPIGet    func(string) string
-	MyAPIPost   func(string, string)
-	MyExec      func(string, ...string) ([]byte, error)
-	MyReadFile  func(string) ([]byte, error)
-	MyWriteFile func(string, []byte, os.FileMode) error
-	cmds        []*cobra.Command
-	configfile  = "/boot/config.yaml"
-	inits       []func()
-	listener    net.Listener
-	forever     chan bool
-	config      ConfigType
+	COMMITHASH    = "dev"
+	BUILDDATETIME = "today"
+	API_VERSION   = "1"
+	BASE_URL      = "127.0.0.1:8080"
+	MyAPIGet      func(string) string
+	MyAPIPost     func(string, string)
+	MyExec        func(string, ...string) ([]byte, error)
+	MyReadFile    func(string) ([]byte, error)
+	MyWriteFile   func(string, []byte, os.FileMode) error
+	cmds          []*cobra.Command
+	configfile    = "/boot/config.yaml"
+	inits         []func()
+	listener      net.Listener
+	forever       chan bool
+	config        ConfigType
 )
 
 func RealReadFile(filename string) ([]byte, error) {
