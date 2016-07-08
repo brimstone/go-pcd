@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func Test_runHandlers(t *testing.T) {
@@ -22,7 +21,7 @@ func Test_runHandlers(t *testing.T) {
 
 func Test_initDaemon(t *testing.T) {
 	// this is here because runHandlers() trips WriteDockerConfig
-	viper.SetDefault("api.address", "127.0.0.1:8080")
+	config.API = "127.0.0.1:8080"
 	t.Log("Testing initDaemon")
 	initDaemon()
 }

@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func init() {
@@ -33,12 +32,12 @@ func handleDockerBip(w http.ResponseWriter, r *http.Request) {
 	//w.Header().Add("Content-Type", "application/json")
 	if r.Method == "POST" {
 		body, _ := ioutil.ReadAll(r.Body)
-		viper.Set("docker.bip", string(body))
+		config.Docker.Bip = string(body)
 		WriteDockerConfig()
 		RestartDocker()
 		saveConfig()
 	} else {
-		bip := viper.GetString("docker.bip")
+		bip := config.Docker.Bip
 		w.Write([]byte(bip))
 	}
 }

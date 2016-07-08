@@ -2,17 +2,42 @@ package main
 
 import (
 	"fmt"
+	"net"
+	"net/http"
 	"os"
 	"testing"
 )
 
 func Test_readKernelConfig(t *testing.T) {
 	t.Log("Testing kernelcmdline read")
-	MyReadFile = func(filename string) ([]byte, error) {
-		return []byte("BOOTIMAGE=primary initrd=primary ro hostname=pickles pcd.foo=bar"), nil
+	ln, err := net.Listen("tcp", ":0")
+	if err != nil {
+		t.Errorf("Error starting listener socket")
+	}
+	_, port, err := net.SplitHostPort(ln.Addr().String())
+	if err != nil {
+		t.Errorf("Error getting listener socket port")
 	}
 
-	err := readKernelConfig()
+	server := http.NewServeMux()
+	server.HandleFunc("/config.json", func(w http.ResponseWriter, r *http.Request) {
+		t.Logf("Giving up the goods")
+		fmt.Fprintf(w, `{"files":[{"path":"blah", "content":"foo"}]}`)
+	})
+	server.HandleFunc("/config.yaml", func(w http.ResponseWriter, r *http.Request) {
+		t.Logf("Giving up the goods")
+		fmt.Fprintf(w, `files:
+  - content: foo
+    path: blah
+`)
+	})
+	go http.Serve(ln, server)
+
+	MyReadFile = func(filename string) ([]byte, error) {
+		return []byte("BOOTIMAGE=primary initrd=primary ro hostname=pickles pcd.foo=bar pcd.url=http://localhost:" + port + "/config.json"), nil
+	}
+
+	err = readKernelConfig()
 	if err != nil {
 		t.Errorf("Error:", err.Error())
 	}
@@ -56,8 +81,8 @@ func Test_readConfigError1(t *testing.T) {
 	}
 
 	err := readConfig()
-	if err != nil {
-		t.Errorf("Error:", err.Error())
+	if err == nil {
+		t.Errorf("Expected an error and didn't receive one.")
 	}
 }
 
@@ -72,8 +97,8 @@ func Test_readConfigError2(t *testing.T) {
 	}
 
 	err := readConfig()
-	if err != nil {
-		t.Errorf("Error:", err.Error())
+	if err == nil {
+		t.Errorf("Expected an error and didn't receive one.")
 	}
 }
 

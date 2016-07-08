@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 	"time"
-
-	"github.com/spf13/viper"
 )
 
 var restartTimer *time.Timer
@@ -28,7 +26,7 @@ func RestartDocker() {
 
 func WriteDockerConfig() {
 	fmt.Println("Writing docker config")
-	config := fmt.Sprintf("BIP=\"%s\"\n", viper.GetString("docker.bip"))
+	opts := fmt.Sprintf("BIP=\"%s\"\n", config.Docker.Bip)
 	os.Mkdir("/etc/config", 0755)
-	MyWriteFile("/etc/config/docker", []byte(config), 0644)
+	MyWriteFile("/etc/config/docker", []byte(opts), 0644)
 }

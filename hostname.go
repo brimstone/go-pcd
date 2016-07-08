@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func init() {
@@ -31,10 +30,7 @@ func cmdHostname(cmd *cobra.Command, args []string) {
 }
 
 func initHostname() {
-	hostname := viper.GetString("hostname")
-	if hostname != "" {
-		SetHostname([]byte(hostname))
-	}
+	SetHostname([]byte(config.Hostname))
 }
 
 func SetHostname(hostname []byte) error {
@@ -52,7 +48,7 @@ func handleHostname(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		viper.Set("hostname", string(body))
+		config.Hostname = string(body)
 		saveConfig()
 	} else {
 		hostnameBytes, err := MyReadFile("/proc/sys/kernel/hostname")

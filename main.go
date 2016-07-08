@@ -1,17 +1,31 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"strings"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
+
+type ConfigType struct {
+	Hostname string `json:"hostname"`
+	API      string `json:"api"`
+	Docker   struct {
+		Bip string
+	}
+	Files []struct {
+		Path    string `json:"path"`
+		Content string `json:"content"`
+	} `json:"files"`
+}
 
 var (
 	API_VERSION = "1"
@@ -22,9 +36,11 @@ var (
 	MyReadFile  func(string) ([]byte, error)
 	MyWriteFile func(string, []byte, os.FileMode) error
 	cmds        []*cobra.Command
+	configfile  = "/boot/config.yaml"
 	inits       []func()
 	listener    net.Listener
 	forever     chan bool
+	config      ConfigType
 )
 
 func RealReadFile(filename string) ([]byte, error) {
@@ -44,18 +60,40 @@ func readKernelConfig() error {
 	if err != nil {
 		return err
 	}
+	kernel := make(map[string]string)
 	options := strings.Split(strings.TrimSpace(string(cmdline)), " ")
 	for _, option := range options {
 		kv := strings.SplitN(option, "=", 2)
 		if len(kv) < 2 {
 			continue
 		}
-		if kv[0][0:4] == "pcd." {
-			viper.Set(kv[0], kv[1])
+		if kv[0] == "pcd.url" {
+			log.Println("Got a url", kv[1])
+			resp, err := http.Get(kv[1])
+			if err == nil {
+				configcontents, err := ioutil.ReadAll(resp.Body)
+				if err != nil {
+					log.Println("Error getting config from url:", err)
+				}
+				err = yaml.Unmarshal(configcontents, &config)
+				if err != nil {
+					log.Println("Error parsing config:", err)
+				}
+				resp.Body.Close()
+
+			}
+		} else if kv[0][0:4] == "pcd." {
+			kernel[kv[0]] = kv[1]
 		} else if kv[0] == "hostname" {
-			viper.Set(kv[0], kv[1])
+			kernel[kv[0]] = kv[1]
 		}
 	}
+	for k, v := range kernel {
+		if k == "hostname" {
+			config.Hostname = v
+		}
+	}
+
 	return nil
 }
 
@@ -64,8 +102,8 @@ func saveConfig() error {
 	if err != nil {
 		return err
 	}
-	b, _ := json.MarshalIndent(viper.AllSettings(), "", "  ")
-	err = MyWriteFile(viper.GetString("file"), b, 0644)
+	b, _ := yaml.Marshal(config)
+	err = MyWriteFile(configfile, b, 0644)
 	if err != nil {
 		return err
 	}
@@ -76,16 +114,18 @@ func saveConfig() error {
 
 func readConfig() error {
 	_, err := MyExec("mount", "LABEL=BOOT", "/boot")
-	if err == nil {
-		err = viper.ReadInConfig()
-		_, err = MyExec("umount", "/boot")
-		if err != nil {
-			fmt.Println("Error reading config file: ", err.Error())
-		}
-		saveConfig()
-	} else {
-		fmt.Println(err.Error())
+	if err != nil {
+		return err
 	}
+	// we have our defaults, kernel config, any url config. Now apply what's on disk
+	// The file on disk shouldn't overwrite anything we already have.
+	configcontents, err := ioutil.ReadFile(configfile)
+	err = yaml.Unmarshal(configcontents, &config)
+	_, err = MyExec("umount", "/boot")
+	if err != nil {
+		return err
+	}
+	saveConfig()
 	return nil
 }
 
