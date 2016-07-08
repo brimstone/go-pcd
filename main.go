@@ -116,7 +116,7 @@ func saveConfig() error {
 func readConfig() error {
 	_, err := MyExec("mount", "LABEL=BOOT", "/boot")
 	if err != nil {
-		return err
+		return nil
 	}
 	// we have our defaults, kernel config, any url config. Now apply what's on disk
 	// The file on disk shouldn't overwrite anything we already have.
