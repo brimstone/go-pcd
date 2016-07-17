@@ -24,7 +24,7 @@ func cmdDockerBip(cmd *cobra.Command, args []string) {
 	} else if len(args) == 1 {
 		MyAPIPost("docker/bip", args[0])
 	} else {
-		cmd.Help()
+		cmd.HelpFunc()
 	}
 }
 

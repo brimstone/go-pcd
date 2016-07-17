@@ -25,7 +25,7 @@ func cmdHostname(cmd *cobra.Command, args []string) {
 	} else if len(args) == 1 {
 		MyAPIPost("hostname", args[0])
 	} else {
-		cmd.Help()
+		cmd.HelpFunc()
 	}
 }
 
