@@ -77,6 +77,9 @@ func Test_readConfigError1(t *testing.T) {
 	t.Log("Testing readConfig exec error 1")
 
 	MyExec = func(cmd string, arg ...string) ([]byte, error) {
+		if cmd == "mount" {
+			return nil, nil
+		}
 		return []byte{}, fmt.Errorf("Exec error")
 	}
 
