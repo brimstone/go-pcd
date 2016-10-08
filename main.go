@@ -26,6 +26,7 @@ type ConfigType struct {
 		Path    string `json:"path"`
 		Content string `json:"content"`
 	} `json:"files"`
+	Commands []string `json:"commands"`
 }
 
 var (
