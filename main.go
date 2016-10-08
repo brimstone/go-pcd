@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"gopkg.in/yaml.v2"
 
@@ -57,6 +58,18 @@ func RealExec(cmd string, arg ...string) ([]byte, error) {
 	return exec.Command(cmd, arg...).CombinedOutput()
 }
 
+func getUrl(url string) *http.Response {
+	for {
+		resp, err := http.Get(url)
+		if err == nil {
+			return resp
+		}
+		log.Println("Error getting config from url:", err)
+		log.Println("Waiting to retry")
+		time.Sleep(time.Second * 2)
+	}
+}
+
 func readKernelConfig() error {
 	cmdline, err := MyReadFile("/proc/cmdline")
 	if err != nil {
@@ -71,19 +84,17 @@ func readKernelConfig() error {
 		}
 		if kv[0] == "pcd.url" {
 			log.Println("Got a url", kv[1])
-			resp, err := http.Get(kv[1])
-			if err == nil {
-				configcontents, err := ioutil.ReadAll(resp.Body)
-				if err != nil {
-					log.Println("Error getting config from url:", err)
-				}
-				err = yaml.Unmarshal(configcontents, &config)
-				if err != nil {
-					log.Println("Error parsing config:", err)
-				}
-				resp.Body.Close()
-
+			resp := getUrl(kv[1])
+			configcontents, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				log.Println("Error getting config from url:", err)
 			}
+			err = yaml.Unmarshal(configcontents, &config)
+			if err != nil {
+				log.Println("Error parsing config:", err)
+			}
+			resp.Body.Close()
+
 		} else if kv[0][0:4] == "pcd." {
 			kernel[kv[0]] = kv[1]
 		} else if kv[0] == "hostname" {
