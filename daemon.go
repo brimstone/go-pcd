@@ -34,6 +34,10 @@ func runHandlers() {
 	for flag {
 		flag = true
 		for init := range inits {
+			// If this module was already started, skip it this round
+			if inits[init].Status {
+				continue
+			}
 			log.Println("Starting", init, "handler")
 			if inits[init].Func() {
 				inits[init].Status = true
