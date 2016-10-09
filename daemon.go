@@ -32,7 +32,7 @@ func initDaemon() bool {
 func runHandlers() {
 	flag := true
 	for flag {
-		flag = true
+		flag = false
 		for init := range inits {
 			// If this module was already started, skip it this round
 			if inits[init].Status {
@@ -41,8 +41,7 @@ func runHandlers() {
 			log.Println("Starting", init, "handler")
 			if inits[init].Func() {
 				inits[init].Status = true
-			} else {
-				flag = false
+				flag = true
 			}
 		}
 	}
