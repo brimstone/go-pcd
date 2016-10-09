@@ -16,7 +16,10 @@ func init() {
 		Long:  "This gets or sets the hostname for the system.",
 		Run:   cmdHostname,
 	})
-	inits = append(inits, initHostname)
+	inits["hostname"] = &initFunc{
+		Func:   initHostname,
+		Status: false,
+	}
 }
 
 func cmdHostname(cmd *cobra.Command, args []string) {
@@ -29,8 +32,9 @@ func cmdHostname(cmd *cobra.Command, args []string) {
 	}
 }
 
-func initHostname() {
+func initHostname() bool {
 	SetHostname([]byte(config.Hostname))
+	return true
 }
 
 func SetHostname(hostname []byte) error {

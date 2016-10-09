@@ -9,10 +9,14 @@ import (
 var restartTimer *time.Timer
 
 func init() {
-	inits = append(inits, func() {
-		WriteDockerConfig()
-		RestartDocker()
-	})
+	inits["docker"] = &initFunc{
+		Func: func() bool {
+			WriteDockerConfig()
+			RestartDocker()
+			return true
+		},
+		Status: false,
+	}
 }
 
 func RestartDocker() {

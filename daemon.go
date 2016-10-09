@@ -16,20 +16,33 @@ func init() {
 		Long:  "",
 		Run:   modeDaemon,
 	})
-	inits = append(inits, initDaemon)
+	inits["daemon"] = &initFunc{
+		Func:   initDaemon,
+		Status: false,
+	}
 }
 
-func initDaemon() {
+func initDaemon() bool {
 	if config.API != "" {
 		BASE_URL = config.API
 	}
+	return true
 }
 
 func runHandlers() {
-	for init := range inits {
-		log.Println("Starting", init, "handler")
-		inits[init]()
+	flag := true
+	for flag {
+		flag = true
+		for init := range inits {
+			log.Println("Starting", init, "handler")
+			if inits[init].Func() {
+				inits[init].Status = true
+			} else {
+				flag = false
+			}
+		}
 	}
+	return
 }
 
 func modeDaemon(cmd *cobra.Command, args []string) {

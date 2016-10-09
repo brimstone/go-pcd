@@ -29,6 +29,11 @@ type ConfigType struct {
 	Commands []string `json:"commands"`
 }
 
+type initFunc struct {
+	Status bool
+	Func   func() bool
+}
+
 var (
 	COMMITHASH    = "dev"
 	BUILDDATETIME = "today"
@@ -41,7 +46,7 @@ var (
 	MyWriteFile   func(string, []byte, os.FileMode) error
 	cmds          []*cobra.Command
 	configfile    = "/boot/config.yaml"
-	inits         []func()
+	inits         = make(map[string]*initFunc)
 	listener      net.Listener
 	forever       chan bool
 	config        ConfigType
