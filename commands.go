@@ -19,7 +19,8 @@ func runCommands() bool {
 	for _, cmd := range config.Commands {
 		cmds := strings.Split(cmd, " ")
 		log.Println("Running cmd:", cmd)
-		MyExec(cmds[0], cmds[1:]...)
+		result, err := MyExec(cmds[0], cmds[1:]...)
+		log.Println("Exit ", err, "Output:", string(result))
 	}
 	return true
 }
