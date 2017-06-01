@@ -61,8 +61,6 @@ func modeDaemon(cmd *cobra.Command, args []string) {
 		fmt.Println(err)
 		return
 	}
-	log.Println("Starting init handlers")
-	runHandlers()
 
 	log.Println("Starting http server on " + BASE_URL)
 	listener, err := net.Listen("tcp", BASE_URL)
@@ -71,6 +69,10 @@ func modeDaemon(cmd *cobra.Command, args []string) {
 		return
 	}
 	go http.Serve(listener, nil)
+
+	log.Println("Starting init handlers")
+	runHandlers()
+
 	forever = make(chan bool)
 	<-forever
 }

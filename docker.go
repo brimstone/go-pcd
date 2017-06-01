@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
+	"log"
 	"os"
 	"time"
 )
@@ -24,13 +25,29 @@ func RestartDocker() {
 		restartTimer.Stop()
 	}
 	restartTimer = time.AfterFunc(time.Second, func() {
+		if _, err := os.Stat("/service/docker"); err != nil {
+			if os.IsNotExist(err) {
+				// file does not exist
+				log.Println("Enabling docker")
+				err = os.Rename("/service.disable/docker", "/service/docker")
+				if err != nil {
+					log.Println("Error enabling docker service")
+				}
+			} else {
+				// other error
+				log.Println("Error checking docker service status")
+			}
+			return
+		}
+		log.Println("Restarting docker")
 		MyExec("sv", "restart", "/service/docker")
 	})
 }
 
 func WriteDockerConfig() {
-	fmt.Println("Writing docker config")
-	opts := fmt.Sprintf("BIP=\"%s\"\n", config.Docker.Bip)
-	os.Mkdir("/etc/config", 0755)
-	MyWriteFile("/etc/config/docker", []byte(opts), 0644)
+	log.Println("Writing docker config")
+
+	daemon, _ := json.Marshal(config.Docker)
+	os.Mkdir("/etc/docker", 0755)
+	MyWriteFile("/etc/docker/daemon.json", daemon, 0644)
 }

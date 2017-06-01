@@ -10,7 +10,7 @@ func init() {
 }
 
 func runCommands() bool {
-	if inits["docker"].Status {
+	if !inits["docker"].Status {
 		return false
 	}
 	log.Println("Running cmd:", config.Command)

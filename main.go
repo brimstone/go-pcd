@@ -17,16 +17,72 @@ import (
 )
 
 type ConfigType struct {
-	Hostname string `json:"hostname"`
-	API      string `json:"api"`
-	Docker   struct {
-		Bip string
-	}
-	Files []struct {
+	Hostname string     `json:"hostname"`
+	API      string     `json:"api"`
+	Docker   dockerType `json:"docker"`
+	Files    []struct {
 		Path    string `json:"path"`
 		Content string `json:"content"`
 	} `json:"files"`
 	Command string `json:"command"`
+}
+
+type dockerType struct {
+	APICorsHeader        string        `json:"api-cors-header,omitempty"`
+	AuthorizationPlugins []interface{} `json:"authorization-plugins,omitempty"`
+	Bip                  string        `json:"bip,omitempty"`
+	Bridge               string        `json:"bridge,omitempty"`
+	CgroupParent         string        `json:"cgroup-parent,omitempty"`
+	ClusterStore         string        `json:"cluster-store,omitempty"`
+	ClusterStoreOpts     struct {
+	} `json:"cluster-store-opts,omitempty"`
+	ClusterAdvertise      string        `json:"cluster-advertise,omitempty"`
+	Debug                 bool          `json:"debug,omitempty"`
+	DefaultGateway        string        `json:"default-gateway,omitempty"`
+	DefaultGatewayV6      string        `json:"default-gateway-v6,omitempty"`
+	DefaultRuntime        string        `json:"default-runtime,omitempty"`
+	DisableLegacyRegistry bool          `json:"disable-legacy-registry,omitempty"`
+	DNS                   []interface{} `json:"dns,omitempty"`
+	DNSOpts               []interface{} `json:"dns-opts,omitempty"`
+	DNSSearch             []interface{} `json:"dns-search,omitempty"`
+	ExecOpts              []interface{} `json:"exec-opts,omitempty"`
+	ExecRoot              string        `json:"exec-root,omitempty"`
+	FixedCidr             string        `json:"fixed-cidr,omitempty"`
+	FixedCidrV6           string        `json:"fixed-cidr-v6,omitempty"`
+	Graph                 string        `json:"graph,omitempty"`
+	Group                 string        `json:"group,omitempty"`
+	Hosts                 []string      `json:"hosts,omitempty"`
+	Icc                   bool          `json:"icc,omitempty"`
+	InsecureRegistries    []interface{} `json:"insecure-registries,omitempty"`
+	IP                    string        `json:"ip,omitempty"`
+	Iptables              bool          `json:"iptables,omitempty"`
+	Ipv6                  bool          `json:"ipv6,omitempty"`
+	IPForward             bool          `json:"ip-forward,omitempty"`
+	IPMasq                bool          `json:"ip-masq,omitempty"`
+	Labels                []interface{} `json:"labels,omitempty"`
+	LiveRestore           bool          `json:"live-restore,omitempty"`
+	LogDriver             string        `json:"log-driver,omitempty"`
+	LogLevel              string        `json:"log-level,omitempty"`
+	LogOpts               struct {
+	} `json:"log-opts,omitempty"`
+	MaxConcurrentDownloads    int           `json:"max-concurrent-downloads,omitempty"`
+	MaxConcurrentUploads      int           `json:"max-concurrent-uploads,omitempty"`
+	Mtu                       int           `json:"mtu,omitempty"`
+	OomScoreAdjust            int           `json:"oom-score-adjust,omitempty"`
+	Pidfile                   string        `json:"pidfile,omitempty"`
+	RawLogs                   bool          `json:"raw-logs,omitempty"`
+	RegistryMirrors           []interface{} `json:"registry-mirrors,omitempty"`
+	SelinuxEnabled            bool          `json:"selinux-enabled,omitempty"`
+	StorageDriver             string        `json:"storage-driver,omitempty"`
+	StorageOpts               []interface{} `json:"storage-opts,omitempty"`
+	SwarmDefaultAdvertiseAddr string        `json:"swarm-default-advertise-addr,omitempty"`
+	TLS                       bool          `json:"tls,omitempty"`
+	Tlscacert                 string        `json:"tlscacert,omitempty"`
+	Tlscert                   string        `json:"tlscert,omitempty"`
+	Tlskey                    string        `json:"tlskey,omitempty"`
+	Tlsverify                 bool          `json:"tlsverify,omitempty"`
+	UserlandProxy             bool          `json:"userland-proxy,omitempty"`
+	UsernsRemap               string        `json:"userns-remap,omitempty"`
 }
 
 type initFunc struct {
@@ -65,8 +121,14 @@ func RealExec(cmd string, arg ...string) ([]byte, error) {
 }
 
 func getUrl(url string) *http.Response {
-	for {
-		resp, err := http.Get(url)
+	for range []int{1, 2, 3} {
+		client := &http.Client{}
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			return nil
+		}
+		req.Header.Set("Metadata-Flavor", "Google")
+		resp, err := client.Do(req)
 		if err == nil {
 			return resp
 		}
@@ -74,9 +136,12 @@ func getUrl(url string) *http.Response {
 		log.Println("Waiting to retry")
 		time.Sleep(time.Second * 2)
 	}
+	return nil
 }
 
 func readKernelConfig() error {
+	processUrl("http://169.254.169.254/latest/user-data", &config)
+	processUrl("http://metadata.google.internal/computeMetadata/v1/instance/attributes/startup-script", &config)
 	cmdline, err := MyReadFile("/proc/cmdline")
 	if err != nil {
 		return err
@@ -88,18 +153,14 @@ func readKernelConfig() error {
 		if len(kv) < 2 {
 			continue
 		}
-		if kv[0] == "pcd.url" {
+
+		if kv[0] == "pcd.url" || kv[0] == "url" {
 			log.Println("Got a url", kv[1])
-			resp := getUrl(kv[1])
-			configcontents, err := ioutil.ReadAll(resp.Body)
+			err := processUrl(kv[1], &config)
 			if err != nil {
-				log.Println("Error getting config from url:", err)
+				log.Println(err)
+				continue
 			}
-			err = yaml.Unmarshal(configcontents, &config)
-			if err != nil {
-				log.Println("Error parsing config:", err)
-			}
-			resp.Body.Close()
 
 		} else if kv[0][0:4] == "pcd." {
 			kernel[kv[0]] = kv[1]
@@ -112,7 +173,26 @@ func readKernelConfig() error {
 			config.Hostname = v
 		}
 	}
+	config.Docker.Hosts = append(config.Docker.Hosts, "unix:///var/run/docker.sock")
+	config.Docker.StorageDriver = "overlay2"
 
+	return nil
+}
+
+func processUrl(url string, config *ConfigType) error {
+	resp := getUrl(url)
+	if resp == nil {
+		return fmt.Errorf("Unable to fetch URL: %s", url)
+	}
+	configcontents, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return fmt.Errorf("Error getting config from url: %s", err)
+	}
+	err = yaml.Unmarshal(configcontents, &config)
+	if err != nil {
+		return fmt.Errorf("Error parsing config: %s", err)
+	}
 	return nil
 }
 
