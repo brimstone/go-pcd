@@ -39,7 +39,7 @@ func Test_readKernelConfig(t *testing.T) {
 
 	err = readKernelConfig()
 	if err != nil {
-		t.Errorf("Error:", err.Error())
+		t.Errorf("Error: %s", err)
 	}
 	t.Log("Kernel config read without errors")
 }
@@ -69,7 +69,7 @@ func Test_readConfig(t *testing.T) {
 
 	err := readConfig()
 	if err != nil {
-		t.Errorf("Error:", err.Error())
+		t.Errorf("Error: %s", err)
 	}
 }
 
@@ -114,7 +114,7 @@ func Test_saveConfigError1(t *testing.T) {
 
 	err := saveConfig()
 	if err == nil {
-		t.Errorf("Error:", err.Error())
+		t.Errorf("Error: %s", err)
 	}
 }
 
@@ -131,7 +131,7 @@ func Test_saveConfigError2(t *testing.T) {
 
 	err := saveConfig()
 	if err == nil {
-		t.Errorf("Error:", err.Error())
+		t.Errorf("Error: %s", err)
 	}
 }
 
@@ -139,7 +139,7 @@ func Test_RealReadFileError(t *testing.T) {
 	t.Log("Testing RealReadFile read error")
 	_, err := RealReadFile("asdf")
 	if err == nil {
-		t.Errorf("Error:", err.Error())
+		t.Errorf("Error: %s", err)
 	}
 }
 
@@ -147,7 +147,7 @@ func Test_RealWriteFileError(t *testing.T) {
 	t.Log("Testing RealWriteFile read error")
 	err := RealWriteFile("/asdf", []byte{}, 0644)
 	if err == nil {
-		t.Errorf("Error:", err.Error())
+		t.Errorf("Error: %s", err)
 	}
 }
 
@@ -155,7 +155,7 @@ func Test_RealExecError(t *testing.T) {
 	t.Log("Testing RealExec read error")
 	_, err := RealExec("asdf")
 	if err == nil {
-		t.Errorf("Error:", err.Error())
+		t.Errorf("Error: %s", err)
 	}
 }
 
