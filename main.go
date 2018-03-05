@@ -162,7 +162,7 @@ func readKernelConfig() error {
 				continue
 			}
 
-		} else if kv[0][0:4] == "pcd." {
+		} else if strings.HasPrefix(kv[0], "pcd.") {
 			kernel[kv[0]] = kv[1]
 		} else if kv[0] == "hostname" {
 			kernel[kv[0]] = kv[1]
