@@ -29,7 +29,7 @@ func init() {
 	})
 	version = versionStruct{
 		APIVersion:    API_VERSION,
-		Version:       "TODO",
+		Version:       "Testing",
 		GitCommit:     COMMITHASH,
 		Builddatetime: BUILDDATETIME,
 		Arch:          runtime.GOOS + "/" + runtime.GOARCH,
