@@ -49,6 +49,7 @@ func runHandlers() {
 }
 
 func modeDaemon(cmd *cobra.Command, args []string) {
+	forever = make(chan bool)
 	log.Println("Reading kernel config")
 	err := readKernelConfig()
 	if err != nil {
@@ -73,6 +74,5 @@ func modeDaemon(cmd *cobra.Command, args []string) {
 	log.Println("Starting init handlers")
 	runHandlers()
 
-	forever = make(chan bool)
 	<-forever
 }
