@@ -12,6 +12,9 @@ var restartTimer *time.Timer
 func init() {
 	inits["docker"] = &initFunc{
 		Func: func() bool {
+			if !inits["files"].Status {
+				return false
+			}
 			WriteDockerConfig()
 			RestartDocker()
 			return true
