@@ -34,7 +34,7 @@ func RestartDocker() {
 				log.Println("Enabling docker")
 				err = os.Rename("/service.disable/docker", "/service/docker")
 				if err != nil {
-					log.Println("Error enabling docker service")
+					log.Printf("Error enabling docker service: %s\n", err)
 				}
 			} else {
 				// other error
