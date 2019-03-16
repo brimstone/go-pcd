@@ -32,7 +32,7 @@ func RestartDocker() {
 			if os.IsNotExist(err) {
 				// file does not exist
 				log.Println("Enabling docker")
-				err = os.Rename("/service.disable/docker", "/service/docker")
+				err = os.Symlink("/etc/service/docker", "/service/docker")
 				if err != nil {
 					log.Printf("Error enabling docker service: %s\n", err)
 				}
